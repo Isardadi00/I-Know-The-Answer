@@ -7,7 +7,7 @@ import styles from './main.css'
 
 function App() {
   return (
-    <div className="App" style={styles.body}>
+    <div className=".fill-window" style={styles.body}>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
