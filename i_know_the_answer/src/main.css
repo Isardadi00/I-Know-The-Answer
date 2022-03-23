@@ -1,3 +1,19 @@
+.login-page {
+    overflow: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background: #3dcfff;
+    height: 100%;
+    width: 100%;
+}
+
+.login-body {
+    background: white;
+    width: 40%;
+    height: 40%;
+}
 
 .register-page {
     overflow: auto;
@@ -12,7 +28,6 @@
 
 .register-body {
     background: white;
-    border: 2px solid black;
     width: 40%;
     height: 40%;
 }
