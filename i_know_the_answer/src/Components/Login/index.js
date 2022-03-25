@@ -1,22 +1,39 @@
-import react, { useState, useEffect } from "react";
-import { useNavigate } from "react-router"
+import useState from 'react-usestateref';
+import { useNavigate } from "react-router";
+import { loginUser } from '../../Services/requestServices';
 
 const Login = () => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState(false);
+    const [username, setUsername, usernameRef] = useState("");
+    const [password, setPassword, passwordRef] = useState("");
+    const [inputError, setInputError] = useState(false);
     let navigate = useNavigate();
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log("User:", {
+        const user = {
             username: username,
             password: password
-        });
-        // todo: log user into website
+        };
+        const loginResponse = await loginUser(user);
+        console.log("Login Response:", loginResponse);
+        if (loginResponse.noError) {
+            navigate("../");
+        }
+        else {
+            setInputError(true);
+            return null;
+        }
     }
 
-    // navigate to register on register click
+    const ShowError = (props) => {
+        const isError = props.isError;
+        if (isError === false) {
+            return null;
+        }
+        else {
+            return <p>Your login information was incorrect.</p>;
+        }
+    }
 
     return (
         <div className="login-page">
@@ -39,7 +56,8 @@ const Login = () => {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </label>
-                    <button onClick={() => {navigate("../register")}}>Register</button>
+                    <ShowError isError={inputError} />
+                    <button onClick={() => { navigate("../register") }}>Register</button>
                     <button type="submit">Log In</button>
                 </form>
             </div>

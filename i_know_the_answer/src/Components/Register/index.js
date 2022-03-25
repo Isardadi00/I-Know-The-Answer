@@ -1,22 +1,23 @@
-import react, { useEffect } from "react";
 import useState from 'react-usestateref';
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router";
+import { registerUser } from "../../Services/requestServices";
 
 const Register = () => {
     const [username, setUsername, usernameRef] = useState("");
     const [password, setPassword, passwordRef] = useState("");
     const [displayName, setDisplayName, displayNameRef] = useState("");
     const [formErrors, setFormErrors, formErrorsRef] = useState({});
+    const [inputError, setInputError] = useState(false);
     let navigate = useNavigate();
-    
+
     const validate = (fields) => {
         const errors = {};
-        if (!(fields.username.length > 3)) {errors.username = "Username must be longer than 3 characters";}
-        if (!(fields.password.length > 8)) {errors.password = "Password must be longer than 8 characters";}
-        if (!(fields.displayName.length > 3)) {errors.displayName = "Display Name must be longer than 8 characters";}
+        if (!(fields.username.length > 3)) { errors.username = "Username must be longer than 3 characters"; }
+        if (!(fields.password.length > 8)) { errors.password = "Password must be longer than 8 characters"; }
+        if (!(fields.displayName.length > 3)) { errors.displayName = "Display Name must be longer than 8 characters"; }
         return errors;
-    }; 
-    
+    };
+
     const handleSubmit = (event) => {
         event.preventDefault();
         const user = {
@@ -26,13 +27,18 @@ const Register = () => {
         };
         setFormErrors(validate(user));
         if (Object.keys(formErrorsRef.current).length > 0) {
-            console.log("Errors:", formErrorsRef.current);
+            setInputError(true);
             return;
         }
         else {
-            // todo: register user
-            console.log(JSON.stringify(user));
-            navigate("/login");
+            var registerSuccess = registerUser(user);
+            if (registerSuccess.noError === false) {
+                setInputError(true)
+
+            }
+            else {
+                navigate("/login");
+            }
         };
     }
 
@@ -42,6 +48,17 @@ const Register = () => {
         setDisplayName("");
         navigate("/login");
     };
+
+    const ShowError = (props) => {
+        const isError = props.isError;
+        console.log("IsError:", isError);
+        if (isError === false) {
+            return null;
+        }
+        else {
+            return <p>You provided insufficient information.</p>;
+        }
+    }
 
     return (
         <div className="register-page">
@@ -72,6 +89,7 @@ const Register = () => {
                             onChange={(e) => setDisplayName(e.target.value)}
                         />
                     </label>
+                    <ShowError isError={inputError} />
                     <button onClick={handleCancel}>Cancel</button>
                     <button type="submit">Register</button>
                 </form>
