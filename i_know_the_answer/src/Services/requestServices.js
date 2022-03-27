@@ -18,16 +18,19 @@ export const registerUser = async user => {
 export const loginUser = async user => {
     var noError = true;
     const res = await fetch(`${baseURL}/login/password`, {
+        'credentials': 'include',
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(user)
-    });
-    if (res.status === 401) {
+    }).then(res => res.json());
+
+    if (res.status === 401){
         noError = false;
     }
-    return { res, noError };
+    
+    return {res, noError};
 };
 
 export const logoutUser = async () => {
@@ -45,16 +48,13 @@ export const logoutUser = async () => {
 };
 
 export const getUserInfo = async () => {
-    var noError = true;
     const res = await fetch(`${baseURL}/user/info`, {
+        'credentials': 'include',
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json',
-            'withCredentials': 'include'
+            'Content-Type': 'application/json'
         }
-    });
-    if (res.bodyUsed === false) {
-        noError = false;
-    }
-    return { res, noError };
+    }).then(res => res.json());
+
+    return res;
 };
