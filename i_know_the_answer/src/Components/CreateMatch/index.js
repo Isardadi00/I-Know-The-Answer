@@ -1,20 +1,38 @@
-import { getUserInfo } from "../../Services/requestServices";
+import { getUserInfo, createMatch } from "../../Services/requestServices";
 import useState from "react-usestateref";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const CreateMatch = () => {
-    const [title, setTitle, titleRef] = useState("");
-    const [image, setImage, imageRef] = useState("");
-    const [questionCounter, setQuestionCounter, questionCounterRef] = useState(1);
-    const [questionTitle, setQuestionTitle, questionTitleRef] = useState("");
-    const [option1, setOption1, option1Ref] = useState({});
-    const [option2, setOption2, option2Ref] = useState({});
-    const [option3, setOption3, option3Ref] = useState({});
-    const [option4, setOption4, option4Ref] = useState({});
+    const [currentQuestion, setCurrentQuestion, questionRef] = useState(0);
+    const [inputError, setInputError] = useState(false);
+    const inputRef = useRef()
+
+    const [match, setMatch, matchRef] = useState({
+        title: "",
+        titleImage: "",
+        questions: [{
+            title: "",
+            options: [
+                {
+                    value: "",
+                    correct: false},
+                {
+                    value: "",
+                    correct: false},
+                {
+                    value: "",
+                    correct: false},
+                {
+                    value: "",
+                    correct: false}
+            ]
+        }],
+        owner: {}
+    });
     let navigate = useNavigate();
 
-    useEffect(() => {
+    useEffect(async () => {
         async function authenticate() {
             const user = await getUserInfo();
             if (user === undefined) {
@@ -24,71 +42,143 @@ const CreateMatch = () => {
         authenticate();
     }, [])
 
-    const handleQuestionSubmit = () => {
-
+    const handleNewQuestion = (event) => {
+        event.preventDefault();
+        setCurrentQuestion(currentQuestion + 1)
+        const newQuestion = {
+            title: "",
+            options: [
+                {
+                    value: "",
+                    correct: false},
+                {
+                    value: "",
+                    correct: false},
+                {
+                    value: "",
+                    correct: false},
+                {
+                    value: "",
+                    correct: false}
+            ]
+        };
+        setMatch({ ...match, questions: [...match.questions, newQuestion] });
     };
 
-    const handleMatchSubmit = async () => {
-
+    const handleCreateMatch = async (event) => {
+        event.preventDefault();
+        if (match.questions.length <= 1) {
+            setInputError(true);
+            return;
+        }
+        setMatch({...match, owner: await getUserInfo()});
+        var matchSubmit = {...match};
+        matchSubmit.questions.pop();
+        console.log("Match to be added:",matchSubmit);
+        
+        await createMatch(matchSubmit);
+        navigate("/");
     };
+
+    const ShowError = (props) => {
+        const isError = props.isError;
+        if (isError === false) {
+            return null;
+        }
+        else {
+            return <p>You must have at least 1 question.</p>;
+        }
+    }
+
+    const handleFileUpload = (file) => {
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+            console.log(reader.result);
+            document.getElementById("yourImgTag").src = reader.result;
+            setMatch({...match, titleImage: `${reader.result}`});
+        };
+        reader.onerror = function (error) {
+            // TODO: Handle error
+            console.log('Error: ', error);
+        };
+    }
 
     return (
         <div>
             <h1>Create Match</h1>
-            <form>
+            <form onSubmit={(event)=> handleCreateMatch(event)}>
                 <label>Title:
                     <input
                         type="text"
-                        value={titleRef.current}
+                        value={matchRef.current.title}
                         placeholder="Enter Match Title"
-                        onChange={(e) => setTitle(e.target.value)} />
+                        required
+                        onChange={(e) => setMatch({...match, title: e.target.value})}/>
                 </label>
                 <label>Match Image:
                     <input
                         type="file"
-                        value={imageRef.current}
-                        onChange={(e) => setImage(e.target.value)} />
+                        required
+                        onChange={() => handleFileUpload(inputRef.current.files[0])}
+                        ref={inputRef}
+                        />
                 </label>
+                <img id="yourImgTag" />
+                <ShowError isError={inputError}/>
+                <input type="submit" value="Create Match"/>
             </form>
             <h1>Questions</h1>
-            <button>Add</button>
-            <h2>Question {questionCounterRef.current}</h2>
-            <form>
-                <label>Title of the Question:
-                    <input
-                        type="text"
-                        value={questionTitleRef.current}
-                        placeholder="Enter the Title of the Question"
-                        onChange={(e) => setQuestionTitle(e.target.value)} />
-                </label>
-                <label>Answer 1:
-                    <input
-                        type="text"
-                        value={option1Ref.current}
-                        placeholder="Enter the answer"
-                        onChange={(e) => setOption1(e.target.value)} />
-                </label>
-                <label>Answer 2:
-                    <input
-                        type="text"
-                        value={option2Ref.current}
-                        placeholder="Enter the answer"
-                        onChange={(e) => setOption2(e.target.value)} />
-                </label>
-                <label>Answer 3:
-                    <input
-                        type="text"
-                        value={option3Ref.current}
-                        placeholder="Enter the answer"
-                        onChange={(e) => setOption3(e.target.value)} />
-                </label>
-                <label>Answer 4:
-                    <input
-                        type="text"
-                        value={option4Ref.current}
-                        placeholder="Enter the answer"
-                        onChange={(e) => setOption4(e.target.value)} />
-                </label>
+            <button onClick={() => navigate("/")}>Cancel</button>
+            <h2>Question {currentQuestion + 1}</h2>
+            <form onSubmit={(event)=> handleNewQuestion(event)}>
+            <label>Title of the Question:
+                <input
+                    type="text"
+                    placeholder="Enter the Title of the Question"
+                    required
+                    value={matchRef.current.questions[currentQuestion].title}
+                    onChange={(e) => {
+                        var newQuestions = [...match.questions];
+                        newQuestions[currentQuestion].title = e.target.value;
+                        setMatch({...match, questions: newQuestions});
+                    }}/>
+            </label>
+            {match.questions[currentQuestion].options.map((answer, answerIndex) => {
+                return (
+                    <div key={answerIndex}>
+                        <label>Answer {answerIndex + 1}:
+                        <input
+                            type="text"
+                            placeholder="Enter the answer"
+                            required
+                            value={matchRef.current.questions[currentQuestion].options[answerIndex].value}
+                            onChange={(e) => {
+                                var newQuestions = [...match.questions];
+                                newQuestions[currentQuestion].options[answerIndex].value = e.target.value;
+                                setMatch({...match, questions: newQuestions});
+                            }}/>
+                        </label>
+                        <label>Right Answer?
+                            <input
+                                type="radio"
+                                name="answer"
+                                required
+                                value={matchRef.current.questions[currentQuestion].options[answerIndex].correct}
+                                onChange={() => {
+                                    var newQuestions = [...match.questions];
+                                    for (let option of newQuestions[currentQuestion].options) {
+                                        option.correct = false;
+                                    }
+                                    newQuestions[currentQuestion].options[answerIndex].correct = true;
+                                    setMatch({...match, questions: newQuestions});
+                                    console.log("Current match: ", match);
+                                }}/>
+                        </label>
+                    </div>
+                )
+            })}
+            <input type="submit" value="Add Question"/>
             </form>
         </div >
     );

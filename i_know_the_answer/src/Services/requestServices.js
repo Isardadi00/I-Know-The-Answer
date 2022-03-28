@@ -64,6 +64,7 @@ export const getUserInfo = async () => {
 
 export const getAllMatches = async () => {
     const res = await fetch(`${baseURL}/matches`, {
+        'credentials': 'include',
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -78,6 +79,7 @@ export const getAllMatches = async () => {
 export const createMatch = async match => {
     var noError = true;
     const res = await fetch(`${baseURL}/matches`, {
+        'credentials': 'include',
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -94,6 +96,7 @@ export const createMatch = async match => {
 
 export const getMatchById = async matchId => {
     const res = await fetch(`${baseURL}/matches/${matchId}`, {
+        'credentials': 'include',
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

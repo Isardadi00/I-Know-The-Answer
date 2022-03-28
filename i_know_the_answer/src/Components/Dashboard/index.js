@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { getUserInfo } from "../../Services/requestServices";
 import useState from "react-usestateref";
 import UserBar from "../UserBar";
+import MatchOverview from "../MatchOverview";
 
 const Dashboard = () => {
     const [user, setUser, userRef] = useState({});
@@ -22,6 +23,7 @@ const Dashboard = () => {
         <div>
             <UserBar user={user} />
             <h1>Dashboard</h1>
+            <MatchOverview />
         </div>
     );
 };
