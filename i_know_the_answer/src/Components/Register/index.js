@@ -1,6 +1,7 @@
-import useState from 'react-usestateref';
+import { useState } from 'react-usestateref';
+import { useEffect } from 'react';
 import { useNavigate } from "react-router";
-import { registerUser } from "../../Services/requestServices";
+import { registerUser, getUserInfo } from "../../Services/requestServices";
 
 const Register = () => {
     const [username, setUsername, usernameRef] = useState("");
@@ -9,6 +10,16 @@ const Register = () => {
     const [formErrors, setFormErrors, formErrorsRef] = useState({});
     const [inputError, setInputError] = useState(false);
     let navigate = useNavigate();
+
+    useEffect(() => {
+        async function authenticate() {
+            const user = await getUserInfo();
+            if (user) {
+                navigate("/");
+            }
+        }
+        authenticate();
+    }, [])
 
     const validate = (fields) => {
         const errors = {};

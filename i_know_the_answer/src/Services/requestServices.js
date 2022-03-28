@@ -26,16 +26,17 @@ export const loginUser = async user => {
         body: JSON.stringify(user)
     }).then(res => res.json());
 
-    if (res.status === 401){
+    if (res.status === 401) {
         noError = false;
     }
-    
-    return {res, noError};
+
+    return { res, noError };
 };
 
 export const logoutUser = async () => {
     var noError = true;
     const res = await fetch(`${baseURL}/logout`, {
+        'credentials': 'include',
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -54,7 +55,52 @@ export const getUserInfo = async () => {
         headers: {
             'Content-Type': 'application/json'
         }
-    }).then(res => res.json());
+    }).then(response => response.json()
+    ).catch(response => console.log(response));
+
+
+    return res;
+};
+
+export const getAllMatches = async () => {
+    const res = await fetch(`${baseURL}/matches`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json()
+    ).catch(response => console.log(response));
+
+
+    return res;
+};
+
+export const createMatch = async match => {
+    var noError = true;
+    const res = await fetch(`${baseURL}/matches`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(match)
+    });
+
+    if (res.status !== 201) {
+        noError = false;
+    }
+
+    return { res, noError };
+};
+
+export const getMatchById = async matchId => {
+    const res = await fetch(`${baseURL}/matches/${matchId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json()
+    ).catch(response => console.log(response));
+
 
     return res;
 };

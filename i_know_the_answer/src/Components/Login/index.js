@@ -1,12 +1,24 @@
 import useState from 'react-usestateref';
 import { useNavigate } from "react-router";
-import { loginUser } from '../../Services/requestServices';
+import { loginUser, getUserInfo } from '../../Services/requestServices';
+import { useEffect } from 'react';
 
 const Login = () => {
     const [username, setUsername, usernameRef] = useState("");
     const [password, setPassword, passwordRef] = useState("");
     const [inputError, setInputError] = useState(false);
     let navigate = useNavigate();
+
+    useEffect(() => {
+        async function authenticate() {
+            const user = await getUserInfo();
+            console.log("Login user:", user);
+            if (user) {
+                navigate("/");
+            }
+        }
+        authenticate();
+    }, [])
 
     const handleSubmit = async (event) => {
         event.preventDefault();
