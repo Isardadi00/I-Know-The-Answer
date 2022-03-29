@@ -10,13 +10,13 @@ const MatchOverview = () => {
 
     useEffect(async () => {
         setMatches(await getAllMatches());
-    },[]);
+    }, []);
 
     return (
         <div>
             <h1>Matchrooms</h1>
             <button onClick={() => navigate("/creatematch")}>Create</button>
-            {matches.map(match => <Match match={match}/>)}
+            {matches.map(match => (console.log("Match:", match), <Match match={match} />))}
         </div >
     );
 };

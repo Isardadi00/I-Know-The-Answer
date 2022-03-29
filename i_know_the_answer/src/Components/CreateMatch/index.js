@@ -16,16 +16,20 @@ const CreateMatch = () => {
             options: [
                 {
                     value: "",
-                    correct: false},
+                    correct: false
+                },
                 {
                     value: "",
-                    correct: false},
+                    correct: false
+                },
                 {
                     value: "",
-                    correct: false},
+                    correct: false
+                },
                 {
                     value: "",
-                    correct: false}
+                    correct: false
+                }
             ]
         }],
         owner: {}
@@ -50,16 +54,20 @@ const CreateMatch = () => {
             options: [
                 {
                     value: "",
-                    correct: false},
+                    correct: false
+                },
                 {
                     value: "",
-                    correct: false},
+                    correct: false
+                },
                 {
                     value: "",
-                    correct: false},
+                    correct: false
+                },
                 {
                     value: "",
-                    correct: false}
+                    correct: false
+                }
             ]
         };
         setMatch({ ...match, questions: [...match.questions, newQuestion] });
@@ -71,11 +79,10 @@ const CreateMatch = () => {
             setInputError(true);
             return;
         }
-        setMatch({...match, owner: await getUserInfo()});
-        var matchSubmit = {...match};
+        const owner = await getUserInfo();
+        setMatch({ ...match, owner: owner });
+        var matchSubmit = { ...matchRef.current };
         matchSubmit.questions.pop();
-        console.log("Match to be added:",matchSubmit);
-        
         await createMatch(matchSubmit);
         navigate("/");
     };
@@ -94,12 +101,10 @@ const CreateMatch = () => {
         var reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = function () {
-            console.log(reader.result);
             document.getElementById("yourImgTag").src = reader.result;
-            setMatch({...match, titleImage: `${reader.result}`});
+            setMatch({ ...match, titleImage: `${reader.result}` });
         };
         reader.onerror = function (error) {
-            // TODO: Handle error
             console.log('Error: ', error);
         };
     }
@@ -107,14 +112,14 @@ const CreateMatch = () => {
     return (
         <div>
             <h1>Create Match</h1>
-            <form onSubmit={(event)=> handleCreateMatch(event)}>
+            <form onSubmit={(event) => handleCreateMatch(event)}>
                 <label>Title:
                     <input
                         type="text"
                         value={matchRef.current.title}
                         placeholder="Enter Match Title"
                         required
-                        onChange={(e) => setMatch({...match, title: e.target.value})}/>
+                        onChange={(e) => setMatch({ ...match, title: e.target.value })} />
                 </label>
                 <label>Match Image:
                     <input
@@ -122,63 +127,62 @@ const CreateMatch = () => {
                         required
                         onChange={() => handleFileUpload(inputRef.current.files[0])}
                         ref={inputRef}
-                        />
+                    />
                 </label>
                 <img id="yourImgTag" />
-                <ShowError isError={inputError}/>
-                <input type="submit" value="Create Match"/>
+                <ShowError isError={inputError} />
+                <input type="submit" value="Create Match" />
             </form>
             <h1>Questions</h1>
             <button onClick={() => navigate("/")}>Cancel</button>
             <h2>Question {currentQuestion + 1}</h2>
-            <form onSubmit={(event)=> handleNewQuestion(event)}>
-            <label>Title of the Question:
-                <input
-                    type="text"
-                    placeholder="Enter the Title of the Question"
-                    required
-                    value={matchRef.current.questions[currentQuestion].title}
-                    onChange={(e) => {
-                        var newQuestions = [...match.questions];
-                        newQuestions[currentQuestion].title = e.target.value;
-                        setMatch({...match, questions: newQuestions});
-                    }}/>
-            </label>
-            {match.questions[currentQuestion].options.map((answer, answerIndex) => {
-                return (
-                    <div key={answerIndex}>
-                        <label>Answer {answerIndex + 1}:
-                        <input
-                            type="text"
-                            placeholder="Enter the answer"
-                            required
-                            value={matchRef.current.questions[currentQuestion].options[answerIndex].value}
-                            onChange={(e) => {
-                                var newQuestions = [...match.questions];
-                                newQuestions[currentQuestion].options[answerIndex].value = e.target.value;
-                                setMatch({...match, questions: newQuestions});
-                            }}/>
-                        </label>
-                        <label>Right Answer?
-                            <input
-                                type="radio"
-                                name="answer"
-                                required
-                                value={matchRef.current.questions[currentQuestion].options[answerIndex].correct}
-                                onChange={() => {
-                                    var newQuestions = [...match.questions];
-                                    for (let option of newQuestions[currentQuestion].options) {
-                                        option.correct = false;
-                                    }
-                                    newQuestions[currentQuestion].options[answerIndex].correct = true;
-                                    setMatch({...match, questions: newQuestions});
-                                    console.log("Current match: ", match);
-                                }}/>
-                        </label>
-                    </div>
-                )
-            })}
-            <input type="submit" value="Add Question"/>
+            <form onSubmit={(event) => handleNewQuestion(event)}>
+                <label>Title of the Question:
+                    <input
+                        type="text"
+                        placeholder="Enter the Title of the Question"
+                        required
+                        value={matchRef.current.questions[currentQuestion].title}
+                        onChange={(e) => {
+                            var newQuestions = [...match.questions];
+                            newQuestions[currentQuestion].title = e.target.value;
+                            setMatch({ ...match, questions: newQuestions });
+                        }} />
+                </label>
+                {match.questions[currentQuestion].options.map((answer, answerIndex) => {
+                    return (
+                        <div key={answerIndex}>
+                            <label>Answer {answerIndex + 1}:
+                                <input
+                                    type="text"
+                                    placeholder="Enter the answer"
+                                    required
+                                    value={matchRef.current.questions[currentQuestion].options[answerIndex].value}
+                                    onChange={(e) => {
+                                        var newQuestions = [...match.questions];
+                                        newQuestions[currentQuestion].options[answerIndex].value = e.target.value;
+                                        setMatch({ ...match, questions: newQuestions });
+                                    }} />
+                            </label>
+                            <label>Right Answer?
+                                <input
+                                    type="radio"
+                                    name="answer"
+                                    required
+                                    value={matchRef.current.questions[currentQuestion].options[answerIndex].correct}
+                                    onChange={() => {
+                                        var newQuestions = [...match.questions];
+                                        for (let option of newQuestions[currentQuestion].options) {
+                                            option.correct = false;
+                                        }
+                                        newQuestions[currentQuestion].options[answerIndex].correct = true;
+                                        setMatch({ ...match, questions: newQuestions });
+                                    }} />
+                            </label>
+                        </div>
+                    )
+                })}
+                <input type="submit" value="Add Question" />
             </form>
         </div >
     );
