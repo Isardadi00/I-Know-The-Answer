@@ -1,22 +1,23 @@
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
-import useState from "react-usestateref";
-import { getAllMatches } from "../../Services/requestServices";
+import { useSelector, useDispatch } from "react-redux";
+import { getMatches } from "../../Actions/matchActions";
 import Match from "../Match";
 
 const MatchOverview = () => {
-    const [matches, setMatches, matchesRef] = useState([]);
     let navigate = useNavigate();
+    const dispatch = useDispatch();
+    const matches = useSelector(state => state.match);
 
     useEffect(async () => {
-        setMatches(await getAllMatches());
+        dispatch(getMatches());
     }, []);
 
     return (
         <div>
             <h1>Matchrooms</h1>
-            <button onClick={() => navigate("/creatematch")}>Create</button>
-            {matches.map(match => (console.log("Match:", match), <Match match={match} />))}
+            <button onClick={() => navigate("/match/create")}>Create</button>
+            {matches.map(match => <Match match={match} />)}
         </div >
     );
 };

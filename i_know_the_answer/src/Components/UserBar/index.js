@@ -1,12 +1,16 @@
 import { useNavigate } from "react-router";
-import { logoutUser, getUserInfo } from "../../Services/requestServices";
+import { useDispatch } from 'react-redux';
+import { logoutUserAction } from "../../Actions/userActions";
+import { logoutUser } from "../../Services/requestServices";
 
 const UserBar = ({ user }) => {
-    let navigate = useNavigate();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleLogout = async () => {
         await logoutUser();
-        navigate("../login");
+        dispatch(logoutUserAction());
+        navigate("/");
     };
 
     return (

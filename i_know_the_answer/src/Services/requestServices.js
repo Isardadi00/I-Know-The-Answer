@@ -1,7 +1,6 @@
 var baseURL = "http://localhost:4567";
 
 export const registerUser = async user => {
-    var noError = true;
     const res = await fetch(`${baseURL}/register`, {
         method: 'POST',
         headers: {
@@ -9,14 +8,10 @@ export const registerUser = async user => {
         },
         body: JSON.stringify(user)
     })
-    if (res.status !== 201) {
-        noError = false;
-    }
-    return { res, noError };
+    return res;
 };
 
 export const loginUser = async user => {
-    var noError = true;
     const res = await fetch(`${baseURL}/login/password`, {
         'credentials': 'include',
         method: 'POST',
@@ -24,17 +19,13 @@ export const loginUser = async user => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(user)
-    }).then(res => res.json());
+    });
+    if (!res.ok) { return; }
 
-    if (res.status === 401) {
-        noError = false;
-    }
-
-    return { res, noError };
+    return await res.json();
 };
 
 export const logoutUser = async () => {
-    var noError = true;
     const res = await fetch(`${baseURL}/logout`, {
         'credentials': 'include',
         method: 'POST',
@@ -42,10 +33,8 @@ export const logoutUser = async () => {
             'Content-Type': 'application/json'
         }
     });
-    if (res.status !== 200) {
-        noError = false;
-    }
-    return { res, noError };
+    if (!res.ok) { return; }
+    return res;
 };
 
 export const getUserInfo = async () => {
@@ -55,11 +44,10 @@ export const getUserInfo = async () => {
         headers: {
             'Content-Type': 'application/json'
         }
-    }).then(response => response.json()
-    ).catch(response => console.log(response));
+    });
+    if (!res.ok) { return; }
 
-
-    return res;
+    return await res.json();
 };
 
 export const getAllMatches = async () => {
@@ -69,9 +57,7 @@ export const getAllMatches = async () => {
         headers: {
             'Content-Type': 'application/json'
         }
-    }).then(response => response.json()
-    ).catch(response => console.log(response));
-
+    });
 
     return res;
 };
@@ -101,9 +87,8 @@ export const getMatchById = async matchId => {
         headers: {
             'Content-Type': 'application/json'
         }
-    }).then(response => response.json()
-    ).catch(response => console.log(response));
+    });
+    if (!res.ok) { return; }
 
-
-    return res;
+    return await res.json();
 };

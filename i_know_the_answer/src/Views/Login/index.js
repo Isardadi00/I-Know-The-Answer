@@ -1,23 +1,24 @@
 import useState from 'react-usestateref';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from "react-router";
-import { loginUser, getUserInfo } from '../../Services/requestServices';
+import { loginUser } from '../../Services/requestServices';
+import { setUser } from '../../Actions/userActions';
 import { useEffect } from 'react';
 
 const Login = () => {
     const [username, setUsername, usernameRef] = useState("");
     const [password, setPassword, passwordRef] = useState("");
     const [inputError, setInputError] = useState(false);
+
+    const user = useSelector(state => state.user);
     let navigate = useNavigate();
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        async function authenticate() {
-            const user = await getUserInfo();
-            console.log("Login user:", user);
-            if (user) {
-                navigate("/");
-            }
+        if (user?.id === undefined) { return; }
+        else {
+            navigate('/dashboard');
         }
-        authenticate();
     }, [])
 
     const handleSubmit = async (event) => {
@@ -27,9 +28,10 @@ const Login = () => {
             password: password
         };
         const loginResponse = await loginUser(user);
-        console.log("Login Response:", loginResponse);
-        if (loginResponse.noError) {
-            navigate("../");
+        console.log("Login response:", loginResponse);
+        if (loginResponse != undefined) {
+            dispatch(setUser(loginResponse));
+            navigate("/dashboard");
         }
         else {
             setInputError(true);

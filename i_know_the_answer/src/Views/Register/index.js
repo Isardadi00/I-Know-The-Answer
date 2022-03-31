@@ -1,7 +1,8 @@
-import { useState } from 'react-usestateref';
+import useState from 'react-usestateref';
+import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { useNavigate } from "react-router";
-import { registerUser, getUserInfo } from "../../Services/requestServices";
+import { registerUser } from "../../Services/requestServices";
 
 const Register = () => {
     const [username, setUsername, usernameRef] = useState("");
@@ -9,16 +10,18 @@ const Register = () => {
     const [displayName, setDisplayName, displayNameRef] = useState("");
     const [formErrors, setFormErrors, formErrorsRef] = useState({});
     const [inputError, setInputError] = useState(false);
+
+    const state = useSelector(state => state);
+    const user = useSelector(state => state.user);
+    console.log("Redux state in register:", state);
+    console.log("Redux user in register:", user);
     let navigate = useNavigate();
 
-    useEffect(() => {
-        async function authenticate() {
-            const user = await getUserInfo();
-            if (user) {
-                navigate("/");
-            }
+    useEffect(async () => {
+        if (user?.id === undefined) { return; }
+        else {
+            navigate('/dashboard');
         }
-        authenticate();
     }, [])
 
     const validate = (fields) => {
@@ -29,7 +32,7 @@ const Register = () => {
         return errors;
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const user = {
             username: username,
@@ -42,13 +45,13 @@ const Register = () => {
             return;
         }
         else {
-            var registerSuccess = registerUser(user);
-            if (registerSuccess.noError === false) {
+            var registerResponse = await registerUser(user);
+            if (!registerResponse.ok) {
                 setInputError(true)
 
             }
             else {
-                navigate("/login");
+                navigate("/");
             }
         };
     }
@@ -57,7 +60,7 @@ const Register = () => {
         setUsername("");
         setPassword("");
         setDisplayName("");
-        navigate("/login");
+        navigate("/");
     };
 
     const ShowError = (props) => {
