@@ -1,51 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { setMatches } from "../../Actions/matchActions";
-import { useEffect } from "react";
+import { useSelector } from "react-redux";
 import useState from "react-usestateref";
 import socket from "../../Services/socketServices";
 
 const Match = ({ match }) => {
     const [joinError, setJoinError] = useState(false);
     const user = useSelector(state => state.user);
-    const matches = useSelector(state => state.match);
-    const matchId = match._id;
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-
-
-    useEffect(() => {
-        socket.on('joinmatch', user => {
-            console.log("User joined match:", user);
-            dispatch(setMatches(matches.map(match => {
-                if (match._id === matchId) {
-                    return {
-                        ...match,
-                        players: [...match.players, user]
-                    }
-                }
-                return match;
-            })));
-        });
-
-        socket.on('leavematch', user => {
-            console.log("User left match:", user);
-            dispatch(setMatches(matches.map(match => {
-                if (match._id === matchId) {
-                    return {
-                        ...match,
-                        players: match.players.filter(player => player.id === user.id)
-                    }
-                }
-                return match;
-            })));
-        });
-
-        return () => {
-            socket.off('joinmatch');
-            socket.off('leavematch');
-        }
-    }, [dispatch, matches, matchId]);
 
     const handleJoinMatchRoom = async () => {
         if (match.status !== "not-started" || match.players.length >= 4) {
