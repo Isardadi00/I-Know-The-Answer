@@ -1,14 +1,13 @@
-import { getUserInfo, createMatch } from "../../Services/requestServices";
+import { createMatch } from "../../Services/requestServices";
 import useState from "react-usestateref";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
-import { setUser } from "../../Actions/userActions";
-import { useSelector, useDispatch } from "react-redux";
+import { useRef } from "react";
+import { useSelector } from "react-redux";
 import UserBar from "../../Components/UserBar";
 
 const CreateMatch = () => {
     const user = useSelector(state => state.user);
-    const [currentQuestion, setCurrentQuestion, questionRef] = useState(0);
+    const [currentQuestion, setCurrentQuestion] = useState(0);
     const [inputError, setInputError] = useState(false);
     const inputRef = useRef()
 
@@ -36,24 +35,9 @@ const CreateMatch = () => {
                 }
             ]
         }],
-        owner: {}
+        owner: user
     });
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-
-
-
-    useEffect(async () => {
-        if (user?.id != undefined) { return; }
-        const session = await getUserInfo();
-
-        if (!session) {
-            navigate("/");
-        }
-        else {
-            dispatch(setUser(session));
-        }
-    }, []);
 
     const handleNewQuestion = (event) => {
         event.preventDefault();
@@ -88,7 +72,6 @@ const CreateMatch = () => {
             setInputError(true);
             return;
         }
-        setMatch({ ...match, owner: user });
         var matchSubmit = { ...matchRef.current };
         matchSubmit.questions.pop();
         await createMatch(matchSubmit);
@@ -138,7 +121,7 @@ const CreateMatch = () => {
                         ref={inputRef}
                     />
                 </label>
-                <img id="yourImgTag" />
+                <img id="yourImgTag" alt="" />
                 <ShowError isError={inputError} />
                 <input type="submit" value="Create Match" />
             </form>

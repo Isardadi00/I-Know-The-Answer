@@ -17,12 +17,12 @@ const Register = () => {
     console.log("Redux user in register:", user);
     let navigate = useNavigate();
 
-    useEffect(async () => {
+    useEffect(() => {
         if (user?.id === undefined) { return; }
         else {
             navigate('/dashboard');
         }
-    }, [])
+    })
 
     const validate = (fields) => {
         const errors = {};

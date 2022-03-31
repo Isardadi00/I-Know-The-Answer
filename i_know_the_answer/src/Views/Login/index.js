@@ -6,8 +6,8 @@ import { setUser } from '../../Actions/userActions';
 import { useEffect } from 'react';
 
 const Login = () => {
-    const [username, setUsername, usernameRef] = useState("");
-    const [password, setPassword, passwordRef] = useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
     const [inputError, setInputError] = useState(false);
 
     const user = useSelector(state => state.user);
@@ -19,7 +19,7 @@ const Login = () => {
         else {
             navigate('/dashboard');
         }
-    }, [])
+    })
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -29,7 +29,7 @@ const Login = () => {
         };
         const loginResponse = await loginUser(user);
         console.log("Login response:", loginResponse);
-        if (loginResponse != undefined) {
+        if (loginResponse !== undefined) {
             dispatch(setUser(loginResponse));
             navigate("/dashboard");
         }

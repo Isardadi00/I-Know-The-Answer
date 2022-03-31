@@ -1,28 +1,17 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { getUserInfo } from "../../Services/requestServices";
-import { useSelector, useDispatch } from "react-redux";
-import { setUser } from "../../Actions/userActions";
+import { useNavigate, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import socket from "../../Services/socketServices";
 import UserBar from "../../Components/UserBar";
+import MatchPlayer from "../../Components/MatchPlayer";
 
 const WaitingRoom = () => {
+    const { id } = useParams();
     const user = useSelector(state => state.user);
+    const match = useSelector(state => state.match.find(match => match._id === id));
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-
-    useEffect(async () => {
-        if (user?.id != undefined) { return; }
-        const session = await getUserInfo();
-
-        if (!session) {
-            navigate("/");
-        }
-        else {
-            dispatch(setUser(session));
-        }
-    }, []);
 
     const handleLeaveMatchRoom = () => {
+        socket.emit('leavematch', id, user);
         navigate("/dashboard")
     }
 
@@ -32,7 +21,7 @@ const WaitingRoom = () => {
             <h1>Waiting for Players to Join</h1>
             <button>Start</button>
             <button onClick={handleLeaveMatchRoom}>Leave</button>
-            <p>*Insert users here*</p>
+            {match?.players.map(player => <MatchPlayer key={player.id} player={player} />)}
         </div>
     );
 };

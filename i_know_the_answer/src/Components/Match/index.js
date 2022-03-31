@@ -1,22 +1,59 @@
 import { useNavigate } from "react-router-dom";
-import { getUserInfo } from '../../Services/requestServices';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setMatches } from "../../Actions/matchActions";
+import { useEffect } from "react";
 import useState from "react-usestateref";
 import socket from "../../Services/socketServices";
 
 const Match = ({ match }) => {
-    const [matchState, setMatchState, matchStateRef] = useState(match);
-    const [joinError, setJoinError, joinErrorRef] = useState(false);
+    const [joinError, setJoinError] = useState(false);
     const user = useSelector(state => state.user);
+    const matches = useSelector(state => state.match);
+    const matchId = match._id;
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+
+    useEffect(() => {
+        socket.on('joinmatch', user => {
+            console.log("User joined match:", user);
+            dispatch(setMatches(matches.map(match => {
+                if (match._id === matchId) {
+                    return {
+                        ...match,
+                        players: [...match.players, user]
+                    }
+                }
+                return match;
+            })));
+        });
+
+        socket.on('leavematch', user => {
+            console.log("User left match:", user);
+            dispatch(setMatches(matches.map(match => {
+                if (match._id === matchId) {
+                    return {
+                        ...match,
+                        players: match.players.filter(player => player.id === user.id)
+                    }
+                }
+                return match;
+            })));
+        });
+
+        return () => {
+            socket.off('joinmatch');
+            socket.off('leavematch');
+        }
+    }, [dispatch, matches, matchId]);
 
     const handleJoinMatchRoom = async () => {
-        if (matchState.status != "not-started" || matchState.players.length >= 4) {
+        if (match.status !== "not-started" || match.players.length >= 4) {
             setJoinError(true);
             return;
         }
-        socket.emit(matchState._id, user)
-        navigate(`/match/${matchState._id}`);
+        socket.emit('joinmatch', match._id, user)
+        navigate(`/match/${match._id}`);
     }
 
     const ShowError = (props) => {
@@ -30,10 +67,10 @@ const Match = ({ match }) => {
     return (
         <div
             onClick={() => handleJoinMatchRoom()}>
-            <h2>{matchState.title}</h2>
-            <img src={matchState.titleImage} alt={matchState.title} />
-            <h3>{matchState.players.length}/4</h3>
-            <h3>{matchState.status}</h3>
+            <h2>{match.title}</h2>
+            <img src={match.titleImage} alt={match.title} />
+            <h3>{match.players.length}/4</h3>
+            <h3>{match.status}</h3>
             <ShowError isError={joinError} />
         </div >
     );
