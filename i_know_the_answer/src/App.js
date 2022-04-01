@@ -6,6 +6,7 @@ import CreateMatch from "./Views/CreateMatch";
 import MainLayout from "./MainLayout";
 import styles from './main.css';
 import WaitingRoom from "./Views/WaitingRoom";
+import MatchRoom from "./Views/MatchRoom";
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/match/create" element={<CreateMatch />} />
           <Route path="/match/:id" element={<WaitingRoom />} />
+          <Route path="/matchroom/:id" element={<MatchRoom />} />
         </Route>
       </Routes>
     </div>

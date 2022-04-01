@@ -11,7 +11,6 @@ const WaitingRoom = () => {
     const user = useSelector(state => state.user);
     const matches = useSelector(state => state.match);
     const singleMatch = matches.find(match => match._id === id);
-    console.log("singleMatch", singleMatch);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -40,22 +39,45 @@ const WaitingRoom = () => {
             })));
         });
 
+        socket.on('startmatch', () => {
+            dispatch(setMatches(matches.map(match => {
+                if (match._id === id) {
+                    return {
+                        ...match,
+                        status: 'started'
+                    }
+                }
+                return match;
+            })));
+            navigate(`/matchroom/${id}`);
+        });
+
         return () => {
             socket.off('joinmatch');
             socket.off('leavematch');
+            socket.off('startmatch');
         }
     }, [matches]);
 
     const handleLeaveMatchRoom = () => {
         socket.emit('leavematch', id, user);
         navigate("/dashboard")
-    }
+    };
+
+    const StartButton = (user) => {
+        if (user === singleMatch.owner) {
+            return (
+                <button onClick={() => socket.emit('startmatch', id)}>Start</button>
+            )
+        }
+        return;
+    };
 
     return (
         <div>
             <UserBar user={user} />
             <h1>Waiting for Players to Join</h1>
-            <button>Start</button>
+            <StartButton user={user} />
             <button onClick={handleLeaveMatchRoom}>Leave</button>
             {singleMatch?.players.map(player => <MatchPlayer key={player.id} player={player} />)}
         </div>
